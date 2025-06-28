@@ -129,9 +129,16 @@
         <button id="syncQuotesButton" class="mt-4">
           Sync All Quotes (GET & Merge)
         </button>
+        <button
+          id="toggleAutoSyncButton"
+          class="mt-4 bg-purple-600 hover:bg-purple-700"
+        >
+          Start Auto Sync
+        </button>
         <div id="loadingIndicator" class="loading-indicator">
           Loading quotes...
         </div>
+        <div id="autoSyncStatus" class="loading-indicator">Auto Sync: Off</div>
       </div>
 
       <div id="sessionStorageDisplay" class="action-section">
