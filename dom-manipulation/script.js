@@ -412,7 +412,7 @@ async function syncQuotes() {
       saveQuotes(); // Save the combined array to local storage
       populateCategories(); // Update categories dropdown
       showRandomQuote(); // Display a random quote from the updated list
-      alert(`Synchronization complete! Added ${addedCount} new quotes and updated ${updatedCount} existing quotes from the server.`);
+      alert("Quotes synced with server!"); // Added the exact message here
     } else {
       alert("No new quotes found on the server to synchronize.");
     }
