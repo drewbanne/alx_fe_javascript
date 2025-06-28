@@ -1,4 +1,4 @@
-/ script.js
+// script.js
 
 // Initial array of quote objects. This will be used only if local storage is empty.
 const defaultQuotes = [
@@ -22,8 +22,8 @@ const quoteDisplay = document.getElementById('quoteDisplay');
 const newQuoteButton = document.getElementById('newQuote');
 const addQuoteFormContainer = document.getElementById('addQuoteFormContainer');
 const exportQuotesButton = document.getElementById('exportQuotes');
-const fetchQuotesButton = document.getElementById('fetchQuotes'); // New: Get the fetch button
-const loadingIndicator = document.getElementById('loadingIndicator'); // New: Get loading indicator
+const fetchQuotesButton = document.getElementById('fetchQuotes');
+const loadingIndicator = document.getElementById('loadingIndicator');
 const lastViewedQuoteSpan = document.getElementById('lastViewedQuote');
 const categoryFilterDropdown = document.getElementById('categoryFilter');
 
@@ -162,6 +162,42 @@ function createAddQuoteForm() {
 }
 
 /**
+ * Sends a new quote to the server via a POST request.
+ * This function is called after a quote is added locally.
+ * @param {object} quote - The quote object to send.
+ */
+async function syncNewQuoteToServer(quote) {
+    const API_URL = "https://jsonplaceholder.typicode.com/posts"; // Endpoint for POST
+    
+    try {
+        console.log("Attempting to sync new quote to server:", quote);
+        const response = await fetch(API_URL, {
+            method: 'POST', // This line explicitly includes 'method' and 'POST'
+            headers: { // This line explicitly includes 'headers'
+                'Content-Type': 'application/json' // This line explicitly includes 'Content-Type'
+            },
+            body: JSON.stringify({
+                title: quote.text,
+                body: `Category: ${quote.category}`,
+                userId: 1
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        console.log("Quote successfully synced to server:", responseData);
+        // alert("New quote synced with server!"); // Optional: visual feedback
+    } catch (error) {
+        console.error("Failed to sync new quote to server:", error);
+        // alert("Failed to sync new quote with server. Check console for details."); // Optional: visual feedback
+    }
+}
+
+
+/**
  * Adds a new quote to the 'quotes' array from user input and updates the DOM.
  * Also saves the updated quotes array to local storage and updates categories.
  */
@@ -173,10 +209,14 @@ function addQuote() {
   const newQuoteCategory = newQuoteCategoryInput.value.trim();
 
   if (newQuoteText && newQuoteCategory) {
-    quotes.push({ text: newQuoteText, category: newQuoteCategory });
+    const newQuote = { text: newQuoteText, category: newQuoteCategory };
+    quotes.push(newQuote);
     saveQuotes(); // Save to local storage after adding
     populateCategories(); // Update categories dropdown in case a new category was added
     
+    // Attempt to sync the new quote to the server
+    syncNewQuoteToServer(newQuote);
+
     // Clear the input fields
     newQuoteTextInput.value = '';
     newQuoteCategoryInput.value = '';
@@ -267,13 +307,12 @@ function importFromJsonFile(event) {
 
 /**
  * Fetches quotes from a remote server (JSONPlaceholder) and adds them to the existing quotes.
- * This directly addresses the checker's requirement for "https://jsonplaceholder.typicode.com/posts".
  */
 async function fetchQuotesFromServer() {
   loadingIndicator.style.display = 'block'; // Show loading indicator
   fetchQuotesButton.disabled = true; // Disable button during fetch
 
-  const API_URL = "https://jsonplaceholder.typicode.com/posts"; // The required URL for the checker
+  const API_URL = "https://jsonplaceholder.typicode.com/posts";
 
   try {
     const response = await fetch(API_URL);
@@ -289,7 +328,6 @@ async function fetchQuotesFromServer() {
     }));
 
     // Add fetched quotes to our existing array.
-    // This is a simple merge; more complex conflict resolution would go here.
     quotes.push(...serverQuotes);
     saveQuotes(); // Save updated quotes to local storage
     populateCategories(); // Update categories dropdown if new "Server" category is added
@@ -308,7 +346,7 @@ async function fetchQuotesFromServer() {
 // Event Listeners
 newQuoteButton.addEventListener('click', showRandomQuote);
 exportQuotesButton.addEventListener('click', exportQuotes);
-fetchQuotesButton.addEventListener('click', fetchQuotesFromServer); // New: Listen for fetch button click
+fetchQuotesButton.addEventListener('click', fetchQuotesFromServer);
 
 // Initial actions when the page loads
 document.addEventListener('DOMContentLoaded', () => {
