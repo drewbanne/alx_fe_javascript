@@ -123,7 +123,12 @@
           onchange="importFromJsonFile(event)"
         />
 
-        <button id="fetchQuotes" class="mt-4">Fetch Quotes from Server</button>
+        <button id="fetchQuotes" class="mt-4">
+          Fetch Quotes from Server (GET)
+        </button>
+        <button id="syncQuotesButton" class="mt-4">
+          Sync All Quotes (GET & Merge)
+        </button>
         <div id="loadingIndicator" class="loading-indicator">
           Loading quotes...
         </div>
